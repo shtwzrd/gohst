@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/docopt/docopt-go"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -50,31 +52,43 @@ options:
 }
 
 func logBasic(args map[string]interface{}, index localRepo) (err error) {
-	e := entry{}
+	cmd, tags := parseOutTags(args["<cmd>"].(string))
+
+	e := invocation{}
 	e.Timestamp = time.Now().UTC()
-	e.Invocation = args["<cmd>"].(string)
+	e.Command = cmd
+	e.Tags = tags
 	e.Status = getResult(args)
 	e.HasStatus = true
-	return index.write(e)
+
+	_, err = index.write(e)
+	return
 }
 
 func logContext(args map[string]interface{}, index localRepo) (err error) {
-	e := entry{}
+	cmd, tags := parseOutTags(args["<cmd>"].(string))
+
+	e := invocation{}
 	e.Timestamp = time.Now().UTC()
-	e.Invocation = args["<cmd>"].(string)
+	e.Command = cmd
+	e.Tags = tags
 	e.Directory = args["<dir>"].(string)
 	e.Host = args["<host>"].(string)
 	e.Shell = args["<shell>"].(string)
 	e.User = args["<user>"].(string)
-	return index.write(e)
+
+	_, err = index.write(e)
+	return
 }
 
 func logResult(args map[string]interface{}, index localRepo) (err error) {
-	e := entry{}
+	e := invocation{}
 	e.Timestamp = time.Now().UTC()
 	e.Status = getResult(args)
 	e.HasStatus = true
-	return index.write(e)
+
+	_, err = index.write(e)
+	return
 }
 
 func getResult(args map[string]interface{}) (result int8) {
@@ -86,5 +100,14 @@ func getResult(args map[string]interface{}) (result int8) {
 		}
 		result = int8(status)
 	}
+	return
+}
+
+func parseOutTags(input string) (command string, tags []string) {
+	// Regex to remove all single and double quoted substrings
+	re := regexp.MustCompile("['][^']*[']|[\"][^\"]*[\"]")
+	s := re.ReplaceAllString(input, "")
+	tags = strings.Fields(strings.Split(s, "#")[1])
+	command = input[0:strings.LastIndex(input, "#")]
 	return
 }

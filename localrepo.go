@@ -11,16 +11,22 @@ type localRepo struct {
 	FilePath string
 }
 
-func (r *localRepo) write(e entry) error {
+func (r *localRepo) write(e invocation) (out string, err error) {
 	file, err := os.OpenFile(r.FilePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var record string
-	if e.Invocation != "" {
-		record = fmt.Sprintf("%c%v%c%s%c%s%c%s%c%s%c", d, e.Timestamp, d, e.User, d, e.Host, d, e.Invocation, d, e.Directory, d)
+	if e.Command != "" {
+		record = fmt.Sprintf("%c%v%c%s%c%s%c%s%c%s%c%s%c",
+			d, e.Timestamp,
+			d, e.User,
+			d, e.Host,
+			d, e.Directory,
+			d, e.Command,
+			d, e.Tags, d)
 	}
 
 	if e.HasStatus {
@@ -28,5 +34,5 @@ func (r *localRepo) write(e entry) error {
 	}
 
 	file.WriteString(record)
-	return nil
+	return record, nil
 }

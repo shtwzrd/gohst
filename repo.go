@@ -1,5 +1,5 @@
 package main
 
 type repo interface {
-	write(e entry) error
+	write(e invocation) error
 }
