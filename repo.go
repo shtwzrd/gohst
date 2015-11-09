@@ -1,5 +1,6 @@
 package main
 
-type repo interface {
-	write(e invocation) error
+type Repo interface {
+	Write(e Invocation) error
+	Query() []Invocation
 }

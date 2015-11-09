@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type invocation struct {
+type Invocation struct {
 	Directory string
 	Shell     string
 	User      string

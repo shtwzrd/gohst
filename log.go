@@ -34,7 +34,7 @@ options:
 	fmt.Println(arguments)
 
 	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".gohstry")
-	index := localRepo{path}
+	index := LocalRepo{path}
 
 	if arguments["basic"].(bool) {
 		return logBasic(arguments, index)
@@ -51,24 +51,23 @@ options:
 	return
 }
 
-func logBasic(args map[string]interface{}, index localRepo) (err error) {
+func logBasic(args map[string]interface{}, index Repo) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
-	e := invocation{}
+	e := Invocation{}
 	e.Timestamp = time.Now().UTC()
 	e.Command = cmd
 	e.Tags = tags
 	e.Status = getResult(args)
 	e.HasStatus = true
 
-	_, err = index.write(e)
-	return
+	return index.Write(e)
 }
 
-func logContext(args map[string]interface{}, index localRepo) (err error) {
+func logContext(args map[string]interface{}, index Repo) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
-	e := invocation{}
+	e := Invocation{}
 	e.Timestamp = time.Now().UTC()
 	e.Command = cmd
 	e.Tags = tags
@@ -77,18 +76,16 @@ func logContext(args map[string]interface{}, index localRepo) (err error) {
 	e.Shell = args["<shell>"].(string)
 	e.User = args["<user>"].(string)
 
-	_, err = index.write(e)
-	return
+	return index.Write(e)
 }
 
-func logResult(args map[string]interface{}, index localRepo) (err error) {
-	e := invocation{}
+func logResult(args map[string]interface{}, index Repo) (err error) {
+	e := Invocation{}
 	e.Timestamp = time.Now().UTC()
 	e.Status = getResult(args)
 	e.HasStatus = true
 
-	_, err = index.write(e)
-	return
+	return index.Write(e)
 }
 
 func getResult(args map[string]interface{}) (result int8) {
