@@ -25,8 +25,6 @@ options:
   -X, --exclude-success        filter out entries with a 0 exit status
   -a, --all                    return all matching history results
   -A, --ALL                    return EVERYTHING
-  --local-only                 search only the locally stored history index
-  --refresh                    force a call for latest from remote
 `
 
 	args, _ := docopt.Parse(usage, nil, true, "", false)

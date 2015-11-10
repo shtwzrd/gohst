@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -19,7 +21,7 @@ func TestToHistLine_NoExitStatus(t *testing.T) {
 	e.Timestamp = now
 
 	expected := "" + now.Format(time.UnixDate) +
-		"sorenlaptop/home/soren/src/project" +
+		"sorenlaptopbash/home/soren/src/project" +
 		"git log --graph --abbrev-commit --decorate --date=relative --all" +
 		"[git log graph]"
 	result := toHistLine(e)
@@ -44,13 +46,48 @@ func TestToHistLine_WithExitStatus(t *testing.T) {
 	e.Timestamp = now
 
 	expected := "" + now.Format(time.UnixDate) +
-		"sorenlaptop/home/soren/src/project" +
+		"sorenlaptopbash/home/soren/src/project" +
 		"git log --graph --abbrev-commit --decorate --date=relative --all" +
-		"[git log graph]0\n"
+		"[git log graph]0\n"
 
 	result := toHistLine(e)
 
 	if result != expected {
 		t.Fail()
 	}
+}
+
+func TestParseToInvocation(t *testing.T) {
+	ti := time.Time{}
+	sync := strconv.QuoteRune(Syncd)
+
+	sample := sync + "" + ti.Format(time.UnixDate) +
+		"sorenlaptopbash/home/soren/src/project" +
+		"git log --graph --abbrev-commit --decorate --date=relative --all" +
+		"[git log graph]0\n"
+
+	expect := Invocation{}
+	expect.User = "soren"
+	expect.Host = "laptop"
+	expect.Shell = "bash"
+	expect.Timestamp = ti
+	expect.Directory = "/home/soren/src/project"
+	expect.Command = "git log --graph --abbrev-commit --decorate --date=relative --all"
+	expect.Tags = []string{"git", "log", "graph"}
+	expect.Status = 0
+	expect.HasStatus = true
+	expect.IsSynced = true
+
+	res, err := parseToInvocation(sample)
+	if err != nil {
+		t.Fail()
+	}
+
+	expectedStr := fmt.Sprint(expect)
+	resultStr := fmt.Sprint(res)
+
+	if expectedStr != resultStr {
+		t.Fail()
+	}
+
 }

@@ -34,7 +34,7 @@ options:
 	fmt.Println(arguments)
 
 	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".gohstry")
-	index := LocalRepo{path}
+	index := Index{path}
 
 	if arguments["basic"].(bool) {
 		return logBasic(arguments, index)
@@ -51,7 +51,7 @@ options:
 	return
 }
 
-func logBasic(args map[string]interface{}, index Repo) (err error) {
+func logBasic(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
 	e := Invocation{}
@@ -64,7 +64,7 @@ func logBasic(args map[string]interface{}, index Repo) (err error) {
 	return index.Write(e)
 }
 
-func logContext(args map[string]interface{}, index Repo) (err error) {
+func logContext(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
 	e := Invocation{}
@@ -79,7 +79,7 @@ func logContext(args map[string]interface{}, index Repo) (err error) {
 	return index.Write(e)
 }
 
-func logResult(args map[string]interface{}, index Repo) (err error) {
+func logResult(args map[string]interface{}, index Index) (err error) {
 	e := Invocation{}
 	e.Timestamp = time.Now().UTC()
 	e.Status = getResult(args)
