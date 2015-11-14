@@ -4,7 +4,7 @@
 # Author: warreq
 # based on Glyf's preexec (glyf.livejournal.com/63106.html)
 
-# This configuration is based around emulating the the preexec and
+# This configuration is based around emulating the preexec and
 # precmd command hooks available in zsh.
 
 # Though portable, this implementation requires certain features
@@ -21,7 +21,7 @@
 if [ "$__prexec_defined" = "true" ]; then
     return 0
 fi
-$__preexec_defined="true"
+__preexec_defined="true"
 
 # contains(string, substring)
 #
@@ -75,8 +75,8 @@ __gohst_preexec_hook() {
     __user="$(whoami)"
     __shell="$SHELL"
     __host="$(cat /etc/hostname)"
-    __cmd="'$@'"
-    gohst log context $__user $__host $__shell $__pwd $__cmd
+    __cmd="$@"
+    gohst log context $__user $__host $__shell $__pwd "$__cmd"
 }
 
 # preexec is invoked right before the execution of every command,

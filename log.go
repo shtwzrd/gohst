@@ -31,7 +31,7 @@ options:
 `
 
 	arguments, _ := docopt.Parse(usage, nil, true, "", false)
-	fmt.Println(arguments)
+	//fmt.Println(arguments)
 
 	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".gohstry")
 	index := Index{path}
@@ -104,7 +104,12 @@ func parseOutTags(input string) (command string, tags []string) {
 	// Regex to remove all single and double quoted substrings
 	re := regexp.MustCompile("['][^']*[']|[\"][^\"]*[\"]")
 	s := re.ReplaceAllString(input, "")
-	tags = strings.Fields(strings.Split(s, "#")[1])
-	command = input[0:strings.LastIndex(input, "#")]
+	cmdSplit := strings.Split(s, "#")
+	if len(cmdSplit) > 1 {
+		tags = strings.Fields(cmdSplit[1])
+		command = input[0:strings.LastIndex(input, "#")]
+	} else {
+		command = input
+	}
 	return
 }
