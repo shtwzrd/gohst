@@ -13,6 +13,8 @@ Usage: gohst [--version] [-h|--help] <command> [<args>...]
 
 options:
    -h, --help
+  --user					   required argument: user that stores or retrieves history
+  --url						   url for the web service	
 
 The supported gohst commands are:
    get        Search the command history
