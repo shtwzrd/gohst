@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"errors"
+
 	"github.com/docopt/docopt-go"
 )
 
@@ -24,10 +27,17 @@ options:
   -x, --exclude-fail           filter out entries with non-0 exit statuses
   -X, --exclude-success        filter out entries with a 0 exit status
   -a, --all                    return all matching history results
-  -A, --ALL                    return EVERYTHING
+  -A, --ALL                    return EVERYTHING			   
 `
 
 	args, _ := docopt.Parse(usage, nil, true, "", false)
 	fmt.Println(args)
 	return
+
+	user := argv["user"].(string)
+	url := argv["url"].(string)
+
+	verbose := args["verbose"].(bool)
+
+	Request(user, url, verbose)
 }
