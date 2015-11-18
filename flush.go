@@ -22,5 +22,5 @@ options:
 	index := Index{path}
 
 	FlushRequest(user, url, index)
-	return
+	return index.MarkSynced()
 }

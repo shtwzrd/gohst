@@ -30,6 +30,45 @@ func (r Index) Write(e IndexEntry) (err error) {
 	return nil
 }
 
+func (r Index) MarkSynced() (err error) {
+	file, err := os.OpenFile(r.FilePath, os.O_RDWR, 0644)
+	if err != nil {
+		return
+	}
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	if scanner.Err() != nil {
+		return err
+	}
+
+	file.Close()
+	os.Remove(r.FilePath)
+	file, err = os.Create(r.FilePath)
+	if err != nil {
+		return
+	}
+
+	w := bufio.NewWriter(file)
+	for _, line := range lines {
+		for index, runeval := range line {
+			if index > 0 {
+				break
+			}
+			if runeval != Syncd {
+				fmt.Fprintf(w, "%c%s\n", Syncd, line[1:len(line)-1])
+			} else {
+				fmt.Fprintf(w, "%s\n", line)
+			}
+		}
+	}
+	err = w.Flush()
+	return
+}
+
 func (r Index) GetUnsynced() (result []IndexEntry, err error) {
 	file, err := os.OpenFile(r.FilePath, os.O_RDWR, 0644)
 	if err != nil {
@@ -43,8 +82,9 @@ func (r Index) GetUnsynced() (result []IndexEntry, err error) {
 			if index > 0 {
 				break
 			}
-			if runeval == Syncd {
-				invocation, parseErr := parseToEntry(scanner.Text())
+			if runeval != Syncd {
+				line := scanner.Text()
+				invocation, parseErr := parseToEntry(line)
 				if parseErr != nil {
 					err = parseErr
 					return
@@ -89,7 +129,19 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 
 func toHistLine(e IndexEntry) (record string) {
 	if e.Command != "" {
-		record = fmt.Sprintf("%c%v%c%s%c%s%c%s%c%s%c%s%c%s%c",
+		if e.Host == "" {
+			e.Host = "null"
+		}
+		if e.User == "" {
+			e.User = "null"
+		}
+		if e.Shell == "" {
+			e.Shell = "null"
+		}
+		if e.Directory == "" {
+			e.Directory = "null"
+		}
+		record = fmt.Sprintf("%c%c%v%c%s%c%s%c%s%c%s%c%s%c%s%c", 'U',
 			D, e.Timestamp.Format(time.UnixDate),
 			D, e.User,
 			D, e.Host,
