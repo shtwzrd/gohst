@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type Invocation struct {
+type IndexEntry struct {
 	Directory string
 	Shell     string
 	User      string

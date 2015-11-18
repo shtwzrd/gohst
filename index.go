@@ -17,7 +17,7 @@ type Index struct {
 	FilePath string
 }
 
-func (r Index) Write(e Invocation) (err error) {
+func (r Index) Write(e IndexEntry) (err error) {
 	file, err := os.OpenFile(r.FilePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
 
 	if err != nil {
@@ -30,7 +30,7 @@ func (r Index) Write(e Invocation) (err error) {
 	return nil
 }
 
-func (r Index) GetUnsynced() (result []Invocation, err error) {
+func (r Index) GetUnsynced() (result []IndexEntry, err error) {
 	file, err := os.OpenFile(r.FilePath, os.O_RDWR, 0644)
 	if err != nil {
 		return
@@ -44,7 +44,7 @@ func (r Index) GetUnsynced() (result []Invocation, err error) {
 				break
 			}
 			if runeval == Syncd {
-				invocation, parseErr := parseToInvocation(scanner.Text())
+				invocation, parseErr := parseToEntry(scanner.Text())
 				if parseErr != nil {
 					err = parseErr
 					return
@@ -56,12 +56,12 @@ func (r Index) GetUnsynced() (result []Invocation, err error) {
 	return
 }
 
-func parseToInvocation(line string) (e Invocation, err error) {
+func parseToEntry(line string) (e IndexEntry, err error) {
 	tokens := strings.FieldsFunc(line, func(c rune) bool {
 		return c == D
 	})
 
-	e = Invocation{}
+	e = IndexEntry{}
 	if tokens[0] == strconv.QuoteRune(Syncd) {
 		e.IsSynced = true
 	} else {
@@ -87,11 +87,11 @@ func parseToInvocation(line string) (e Invocation, err error) {
 	return
 }
 
-func (r Index) Sync() (result []Invocation, err error) {
+func (r Index) Sync() (result []IndexEntry, err error) {
 	return nil, nil
 }
 
-func toHistLine(e Invocation) (record string) {
+func toHistLine(e IndexEntry) (record string) {
 	if e.Command != "" {
 		record = fmt.Sprintf("%c%v%c%s%c%s%c%s%c%s%c%s%c%s%c",
 			D, e.Timestamp.Format(time.UnixDate),

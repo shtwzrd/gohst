@@ -53,7 +53,7 @@ options:
 func logBasic(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
-	e := Invocation{}
+	e := IndexEntry{}
 	e.Timestamp = time.Now().UTC()
 	e.Command = cmd
 	e.Tags = tags
@@ -66,7 +66,7 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 func logContext(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
-	e := Invocation{}
+	e := IndexEntry{}
 	e.Timestamp = time.Now().UTC()
 	e.Command = cmd
 	e.Tags = tags
@@ -79,7 +79,7 @@ func logContext(args map[string]interface{}, index Index) (err error) {
 }
 
 func logResult(args map[string]interface{}, index Index) (err error) {
-	e := Invocation{}
+	e := IndexEntry{}
 	e.Timestamp = time.Now().UTC()
 	e.Status = getResult(args)
 	e.HasStatus = true
