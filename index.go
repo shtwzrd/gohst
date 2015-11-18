@@ -87,10 +87,6 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 	return
 }
 
-func (r Index) Sync() (result []IndexEntry, err error) {
-	return nil, nil
-}
-
 func toHistLine(e IndexEntry) (record string) {
 	if e.Command != "" {
 		record = fmt.Sprintf("%c%v%c%s%c%s%c%s%c%s%c%s%c%s%c",

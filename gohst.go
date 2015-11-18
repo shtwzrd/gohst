@@ -52,6 +52,8 @@ func runCommand(cmd string, args []string, user string, url string) (err error) 
 	switch cmd {
 	case "get":
 		return getCommand(argv, user, url)
+	case "flush":
+		return flushCommand(argv, user, url)
 	case "log":
 		return logCommand(argv)
 	case "help", "":

@@ -1,11 +1,28 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
+
+func FlushRequest(user string, url string, index Index) {
+	unsynced, err := index.GetUnsynced()
+	if err != nil {
+		panic(fmt.Sprintf("[gohst] %s: %s\n", "Invalid Hist File Error: ", err))
+	}
+
+	payload := make(Invocations, len(unsynced))
+
+	for i, v := range unsynced {
+		payload[i] = v.ToInvocation()
+	}
+	query := url + "/api/users/" + user + "/commands"
+	send(query, payload)
+	return
+}
 
 func GetRequest(user string, url string, verbose bool, count int) (result []string) {
 
@@ -22,23 +39,40 @@ func GetRequest(user string, url string, verbose bool, count int) (result []stri
 	return
 }
 
+func send(url string, invs Invocations) {
+	jsonStr, err := json.Marshal(invs)
+	if err != nil {
+		panic(fmt.Sprintf("[gohst] %s: %s\n", "JSON Encoding Error: ", err))
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(fmt.Sprintf("[gohst] %s: %s\n", "Connection Error: ", err))
+	}
+	defer resp.Body.Close()
+}
+
 func receive(url string, isJson bool) (commands []string) {
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic(fmt.Sprintf("[gohst] %s: %s", "Connection Error: ", err))
+		panic(fmt.Sprintf("[gohst] %s: %s\n", "Connection Error: ", err))
 	}
 
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic(fmt.Sprintf("[gohst] %s: %s", "Response Reading Error: ", err))
+		panic(fmt.Sprintf("[gohst] %s: %s\n", "Response Reading Error: ", err))
 	}
 
 	if isJson {
-		jsonArray, err := marshalInvocations(contents)
+		jsonArray, err := unmarshalInvocations(contents)
 		if err != nil {
-			panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
+			panic(fmt.Sprintf("[gohst] %s: %s\n", "Malformed Response Error: ", err))
 		}
 		for _, v := range jsonArray {
 			commands = append(commands, fmt.Sprint(v))
@@ -46,16 +80,16 @@ func receive(url string, isJson bool) (commands []string) {
 	} else {
 		err = json.Unmarshal(contents, &commands)
 		if err != nil {
-			panic(fmt.Sprintf("[gohst] %s: %v", "Malformed Response Error: ", err))
+			panic(fmt.Sprintf("[gohst] %s: %v\n", "Malformed Response Error: ", err))
 		}
 	}
 	return
 }
 
-func marshalInvocations(content []byte) (result Invocations, err error) {
+func unmarshalInvocations(content []byte) (result Invocations, err error) {
 	err = json.Unmarshal(content, &result)
 	if err != nil {
-		panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
+		panic(fmt.Sprintf("[gohst] %s: %s\n", "Malformed Response Error: ", err))
 	}
 	return
 }
