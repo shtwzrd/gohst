@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"errors"
-
 	"github.com/docopt/docopt-go"
 )
 
-func getCommand(argv []string) (err error) {
+func getCommand(argv []string, user string, url string) (err error) {
 	usage := `gohst -- your history, remote and secure.
 
 Usage:
@@ -31,13 +28,12 @@ options:
 `
 
 	args, _ := docopt.Parse(usage, nil, true, "", false)
+
 	fmt.Println(args)
-	return
-
-	user := argv["user"].(string)
-	url := argv["url"].(string)
-
-	verbose := args["verbose"].(bool)
+	//verbose := args["verbose"].(bool)
+	//Hard coded values, as we had issues with docopt parsing
+	verbose := false
 
 	Request(user, url, verbose)
+	return
 }
