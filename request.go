@@ -9,18 +9,16 @@ import (
 
 func GetRequest(user string, url string, verbose bool) (result []string) {
 
-	//gohst.herokuapp.com
-	//?verbose=true
 	if verbose {
-		result = receive(url + "/api/users/" + user + "/commands" + "?verbose=true")
+		result = receive(url+"/api/users/"+user+"/commands"+"?verbose=true", true)
 	} else {
-		result = receive(url + "/api/users/" + user + "/commands")
+		result = receive(url+"/api/users/"+user+"/commands", false)
 	}
 
 	return
 }
 
-func receive(url string) (commands []string) {
+func receive(url string, isJson bool) (commands []string) {
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -33,10 +31,27 @@ func receive(url string) (commands []string) {
 		panic(fmt.Sprintf("[gohst] %s: %s", "Response Reading Error: ", err))
 	}
 
-	err = json.Unmarshal(contents, &commands)
+	if isJson {
+		jsonArray, err := marshalInvocations(contents)
+		if err != nil {
+			panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
+		}
+		for _, v := range jsonArray {
+			commands = append(commands, fmt.Sprint(v))
+		}
+	} else {
+		err = json.Unmarshal(contents, &commands)
+		if err != nil {
+			panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
+		}
+	}
+	return
+}
+
+func marshalInvocations(content []byte) (result Invocations, err error) {
+	err = json.Unmarshal(content, &result)
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
 	}
-
 	return
 }
