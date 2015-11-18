@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/docopt/docopt-go"
+	"strconv"
 )
 
 func getCommand(argv []string, user string, url string) (err error) {
@@ -23,14 +24,21 @@ options:
   -v, --verbose                show metadata for history
   -x, --exclude-fail           filter out entries with non-0 exit statuses
   -X, --exclude-success        filter out entries with a 0 exit status
-  -a, --all                    return all matching history results
-  -A, --ALL                    return EVERYTHING
+  -A, --ALL                    return everything
 `
 	args, err := docopt.Parse(usage, argv, false, "", false, false)
 
 	verbose := args["--verbose"].(bool)
 
-	results := GetRequest(user, url, verbose)
+	count := 0
+	if !args["--ALL"].(bool) {
+		count, err = strconv.Atoi(args["--count"].(string))
+		if err != nil {
+			panic(fmt.Sprintf("%s is not an integer", args["num"].(string)))
+		}
+	}
+
+	results := GetRequest(user, url, verbose, count)
 
 	for _, s := range results {
 		fmt.Println(s)

@@ -7,14 +7,18 @@ import (
 	"net/http"
 )
 
-func GetRequest(user string, url string, verbose bool) (result []string) {
+func GetRequest(user string, url string, verbose bool, count int) (result []string) {
 
+	query := url + "/api/users/" + user + "/commands"
 	if verbose {
-		result = receive(url+"/api/users/"+user+"/commands"+"?verbose=true", true)
+		query += "?verbose=true"
 	} else {
-		result = receive(url+"/api/users/"+user+"/commands", false)
+		query += "?verbose=false"
 	}
-
+	if count > 0 {
+		query += fmt.Sprintf("%s%d", "&count=", count)
+	}
+	result = receive(query, verbose)
 	return
 }
 
@@ -42,7 +46,7 @@ func receive(url string, isJson bool) (commands []string) {
 	} else {
 		err = json.Unmarshal(contents, &commands)
 		if err != nil {
-			panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
+			panic(fmt.Sprintf("[gohst] %s: %v", "Malformed Response Error: ", err))
 		}
 	}
 	return
