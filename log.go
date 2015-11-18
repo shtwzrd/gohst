@@ -26,14 +26,13 @@ options:
 	<dir>                the directory from which the command was invoked
 	<exitcode>           the exit code of the command
 	<cmd>                the executed command
-	--FILE=<file>        alternate history file [default: ~/.gohstry]
+	--FILE=<file>        alternate hist file, relative to home [default: .gohstry]
 	-f, --force          write entry immediately to the remote
 `
 
-	arguments, _ := docopt.Parse(usage, nil, true, "", false)
-	//fmt.Println(arguments)
+	arguments, _ := docopt.Parse(usage, argv, true, "", false)
 
-	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), ".gohstry")
+	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), arguments["--FILE"].(string))
 	index := Index{path}
 
 	if arguments["basic"].(bool) {
