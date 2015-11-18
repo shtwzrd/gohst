@@ -7,14 +7,17 @@ import (
 )
 
 func main() {
-	usage := `gohst -- your history, remote and secure.
+	usage := `gohst.
 
-Usage: gohst [--user=<USER>] [--url=<URL>] [--version] [-h|--help] <command> [<args>...]
+Usage: gohst (-u USER) (-d URL) <command> [<args>...]
+       gohst --version
+       gohst -h | --help
 
-options:
-   -h, --help
-  --user=<user>					user that stores or retrieves history
-  --url=<url>					url for the web service	
+Options:
+   -d --domain=URL  Domain of the web service, e.g. gohst.herokuapp.com
+   -u --user=USER
+   -h --help
+   --version
 
 The supported gohst commands are:
    get        Search the command history
@@ -31,12 +34,8 @@ See 'gohst help <command>' for more information on a specific command.
 
 	cmd := args["<command>"].(string)
 
-	//user := args["<user>"].(string)
-	//url := args["<url>"].(string)
-
-	//Hard coded values, as we had issues with docopt parsing
-	user := "test"
-	url := "http://gohst.herokuapp.com"
+	user := args["--user"].(string)
+	url := "https://" + args["--domain"].(string)
 
 	cmdArgs := args["<args>"].([]string)
 	err := runCommand(cmd, cmdArgs, user, url)

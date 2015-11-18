@@ -7,42 +7,36 @@ import (
 	"net/http"
 )
 
-func Request(user string, url string, verbose bool) (result []string, err error) {
+func GetRequest(user string, url string, verbose bool) (result []string) {
 
 	//gohst.herokuapp.com
 	//?verbose=true
-
-	var message = make([]string, 10)
-
 	if verbose {
-		requestCommand(url + "/api/users/" + user + "/commands" + "?verbose=true")
+		result = receive(url + "/api/users/" + user + "/commands" + "?verbose=true")
 	} else {
-		message, _ = requestCommand(url + "/api/users/" + user + "/commands")
-	}
-
-	for _, s := range message {
-		fmt.Println(s)
+		result = receive(url + "/api/users/" + user + "/commands")
 	}
 
 	return
 }
 
-func requestCommand(url string) (commands []string, err error) {
+func receive(url string) (commands []string) {
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic("Could not reach web service with given URL. Check the connection")
+		panic(fmt.Sprintf("[gohst] %s: %s", "Connection Error: ", err))
 	}
-
-	var message = make([]string, 10)
 
 	defer resp.Body.Close()
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		panic("Could not read from response body")
+		panic(fmt.Sprintf("[gohst] %s: %s", "Response Reading Error: ", err))
 	}
 
-	err = json.Unmarshal(contents, &message)
+	err = json.Unmarshal(contents, &commands)
+	if err != nil {
+		panic(fmt.Sprintf("[gohst] %s: %s", "Malformed Response Error: ", err))
+	}
 
-	return message, err
+	return
 }

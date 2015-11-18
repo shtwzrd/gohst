@@ -6,7 +6,7 @@ import (
 )
 
 func getCommand(argv []string, user string, url string) (err error) {
-	usage := `gohst -- your history, remote and secure.
+	usage := `gohst.
 
 Usage:
   gohst get [options] [<searchterm>...]
@@ -24,16 +24,17 @@ options:
   -x, --exclude-fail           filter out entries with non-0 exit statuses
   -X, --exclude-success        filter out entries with a 0 exit status
   -a, --all                    return all matching history results
-  -A, --ALL                    return EVERYTHING			   
+  -A, --ALL                    return EVERYTHING
 `
+	args, err := docopt.Parse(usage, argv, false, "", false, false)
 
-	args, _ := docopt.Parse(usage, nil, true, "", false)
+	verbose := args["--verbose"].(bool)
 
-	fmt.Println(args)
-	//verbose := args["verbose"].(bool)
-	//Hard coded values, as we had issues with docopt parsing
-	verbose := false
+	results := GetRequest(user, url, verbose)
 
-	Request(user, url, verbose)
+	for _, s := range results {
+		fmt.Println(s)
+	}
+
 	return
 }
