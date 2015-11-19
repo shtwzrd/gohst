@@ -13,10 +13,9 @@ import (
 func logCommand(argv []string) (err error) {
 	usage := `gohst log; write commands to history
 Usage:
-	gohst log basic <cmd> <exitcode>
-	gohst log result <exitcode>
-	gohst log context <user> <host> <shell> <dir> <cmd>
-	gohst log -h | --help | --version | -f | --force | --FILE=<file>
+	gohst log basic [options] <cmd> <exitcode>
+	gohst log result [options] <exitcode>
+	gohst log context [options] <user> <host> <shell> <dir> <cmd>
 
 options:
 	-h, --help
