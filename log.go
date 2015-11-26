@@ -39,6 +39,9 @@ options:
 		if err == nil && arguments["--force"].(bool) {
 			FlushRequest(user, url, index)
 		}
+		if err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
 
@@ -50,6 +53,9 @@ options:
 		err = logResult(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
 			FlushRequest(user, url, index)
+		}
+		if err != nil {
+			fmt.Println(err)
 		}
 		return
 	}
@@ -71,14 +77,16 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 	e.Status = getResult(args)
 	e.HasStatus = true
 
-	return index.Write(e)
+	err = index.Write(e)
+	index.Flush()
+	return
 }
 
 func logContext(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
 	if hasSilentTag(tags) {
-		return nil
+		return
 	}
 
 	e := IndexEntry{}
@@ -100,9 +108,10 @@ func logResult(args map[string]interface{}, index Index) (err error) {
 		e.Status = getResult(args)
 		e.HasStatus = true
 
-		return index.Write(e)
+		err = index.Write(e)
 	}
-	return nil
+	index.Flush()
+	return
 }
 
 func getResult(args map[string]interface{}) (result int8) {

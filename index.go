@@ -108,6 +108,19 @@ func (r Index) GetUnsynced() (result []IndexEntry, err error) {
 	return
 }
 
+func (r Index) Flush() {
+	file, err := os.OpenFile(r.FilePath, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return
+	}
+
+	defer file.Close()
+
+	if _, err = file.WriteString("\n"); err != nil {
+		panic(err)
+	}
+}
+
 func (r Index) lastLineValid() (valid bool) {
 	file, err := os.OpenFile(r.FilePath, os.O_RDWR, 0644)
 	if err != nil {
@@ -123,8 +136,13 @@ func (r Index) lastLineValid() (valid bool) {
 			if index > 0 {
 				break
 			}
-			if runeval != Syncd && runeval != 'U' {
+			fmt.Println(runeval)
+			if runeval == Syncd || runeval == 'U' {
+				fmt.Println("valid")
 				isValidLine = true
+			} else {
+				fmt.Println("invalid")
+				isValidLine = false
 			}
 		}
 	}
@@ -165,6 +183,7 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 	if len(tokens) < 9 {
 		exitcode = 0
 	} else {
+		fmt.Println(tokens[8])
 		exitcode, err = strconv.Atoi(tokens[8])
 		if err != nil {
 			return
@@ -200,7 +219,7 @@ func toHistLine(e IndexEntry) (record string) {
 	}
 
 	if e.HasStatus {
-		record = fmt.Sprintf("%s%d%c\n", record, e.Status, D)
+		record = fmt.Sprintf("%s%d%c", record, e.Status, D)
 	}
 	return
 }
