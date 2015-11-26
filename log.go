@@ -94,12 +94,15 @@ func logContext(args map[string]interface{}, index Index) (err error) {
 }
 
 func logResult(args map[string]interface{}, index Index) (err error) {
-	e := IndexEntry{}
-	e.Timestamp = time.Now().UTC()
-	e.Status = getResult(args)
-	e.HasStatus = true
+	if index.lastLineValid() {
 
-	return index.Write(e)
+		e := IndexEntry{}
+		e.Status = getResult(args)
+		e.HasStatus = true
+
+		return index.Write(e)
+	}
+	return nil
 }
 
 func getResult(args map[string]interface{}) (result int8) {

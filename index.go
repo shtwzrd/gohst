@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -107,6 +108,29 @@ func (r Index) GetUnsynced() (result []IndexEntry, err error) {
 	return
 }
 
+func (r Index) lastLineValid() (valid bool) {
+	file, err := os.OpenFile(r.FilePath, os.O_RDWR, 0644)
+	if err != nil {
+		return
+	}
+
+	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(reader)
+
+	var isValidLine bool
+	for scanner.Scan() {
+		for index, runeval := range scanner.Text() {
+			if index > 0 {
+				break
+			}
+			if runeval != Syncd && runeval != 'U' {
+				isValidLine = true
+			}
+		}
+	}
+	return isValidLine
+}
+
 func parseToEntry(line string) (e IndexEntry, err error) {
 	tokens := strings.FieldsFunc(line, func(c rune) bool {
 		return c == D
@@ -115,8 +139,13 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 	e = IndexEntry{}
 	if tokens[0] == strconv.QuoteRune(Syncd) {
 		e.IsSynced = true
-	} else {
+	} else if tokens[0] == "U" {
 		e.IsSynced = false
+	} else {
+		fmt.Println(tokens[0])
+		errstr := "Your gohst index file appears malformed with line:\n" + line
+		fmt.Fprintln(os.Stderr, errstr)
+		return IndexEntry{}, errors.New(errstr)
 	}
 
 	e.Timestamp, err = time.Parse(UnixDate, tokens[1])
@@ -129,9 +158,17 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 	e.Directory = tokens[5]
 	e.Command = tokens[6]
 	e.Tags = strings.Fields(tokens[7][1 : len(tokens[7])-1])
-	exitcode, err := strconv.Atoi(tokens[8])
-	if err != nil {
-		return
+	// if we have a command with no exit code, it means the shell probably
+	// exited between logging context and logging exit code. This could happen
+	// if the command was, for example, 'exit'. We assume it returned 0
+	var exitcode int
+	if len(tokens) < 9 {
+		exitcode = 0
+	} else {
+		exitcode, err = strconv.Atoi(tokens[8])
+		if err != nil {
+			return
+		}
 	}
 	e.Status = int8(exitcode)
 	e.HasStatus = true
