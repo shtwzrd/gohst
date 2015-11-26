@@ -136,12 +136,9 @@ func (r Index) lastLineValid() (valid bool) {
 			if index > 0 {
 				break
 			}
-			fmt.Println(runeval)
 			if runeval == Syncd || runeval == 'U' {
-				fmt.Println("valid")
 				isValidLine = true
 			} else {
-				fmt.Println("invalid")
 				isValidLine = false
 			}
 		}
@@ -160,9 +157,7 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 	} else if tokens[0] == "U" {
 		e.IsSynced = false
 	} else {
-		fmt.Println(tokens[0])
 		errstr := "Your gohst index file appears malformed with line:\n" + line
-		fmt.Fprintln(os.Stderr, errstr)
 		return IndexEntry{}, errors.New(errstr)
 	}
 
@@ -183,7 +178,6 @@ func parseToEntry(line string) (e IndexEntry, err error) {
 	if len(tokens) < 9 {
 		exitcode = 0
 	} else {
-		fmt.Println(tokens[8])
 		exitcode, err = strconv.Atoi(tokens[8])
 		if err != nil {
 			return

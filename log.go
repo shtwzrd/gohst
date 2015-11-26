@@ -79,13 +79,14 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 
 	err = index.Write(e)
 	index.Flush()
-	return
+	return index.MarkSynced()
 }
 
 func logContext(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
 	if hasSilentTag(tags) {
+		index.Write(dummyContext())
 		return
 	}
 
@@ -111,7 +112,7 @@ func logResult(args map[string]interface{}, index Index) (err error) {
 		err = index.Write(e)
 	}
 	index.Flush()
-	return
+	return index.MarkSynced()
 }
 
 func getResult(args map[string]interface{}) (result int8) {
@@ -147,4 +148,16 @@ func hasSilentTag(input []string) bool {
 		}
 	}
 	return false
+}
+
+func dummyContext() IndexEntry {
+	e := IndexEntry{}
+	e.Timestamp = time.Now().UTC()
+	e.Command = "null"
+	e.Tags = nil
+	e.Directory = "null"
+	e.Host = "null"
+	e.Shell = "null"
+	e.User = "null"
+	return e
 }
