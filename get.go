@@ -40,8 +40,8 @@ options:
 
 	results := GetRequest(user, url, verbose, count)
 
-	for _, s := range results {
-		fmt.Println(s)
+	for i := len(results) - 1; i >= 0; i-- {
+		fmt.Println(results[i])
 	}
 
 	return
