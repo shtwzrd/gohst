@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/docopt/docopt-go"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -38,7 +39,8 @@ See 'gohst help <command>' for more information on a specific command.
 	domain := args["--domain"].(string)
 
 	var url string
-	if domain == "localhost" || domain == "127.0.0.1" {
+	if strings.HasPrefix(domain, "localhost") ||
+		strings.HasPrefix(domain, "127.0.0.1") {
 		url = "http://" + domain
 	} else {
 		url = "https://" + domain
