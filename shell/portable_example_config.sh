@@ -39,7 +39,11 @@ contains() {
 }
 
 __gohst_precmd_hook() {
-    gohst -u test -d gohst.herokuapp.com log -f result $1 &
+    r="$1"
+    cmd='gohst -u man -d gohst.herokuapp.com log -f result'
+    cmd="$cmd $r"
+    cmd="$cmd &"
+    sh -c "$cmd"
 }
 
 # precmd is a hook executed every time the command prompt is drawn.
