@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func logCommand(argv []string) (err error) {
+func logCommand(argv []string, user string, url string) (err error) {
 	usage := `gohst log; write commands to history
 Usage:
 	gohst log basic [options] <cmd> <exitcode>
@@ -35,7 +35,11 @@ options:
 	index := Index{path}
 
 	if arguments["basic"].(bool) {
-		return logBasic(arguments, index)
+		err = logBasic(arguments, index)
+		if err == nil && arguments["--force"].(bool) {
+			FlushRequest(user, url, index)
+		}
+		return
 	}
 
 	if arguments["context"].(bool) {
@@ -43,7 +47,11 @@ options:
 	}
 
 	if arguments["result"].(bool) {
-		return logResult(arguments, index)
+		err = logResult(arguments, index)
+		if err == nil && arguments["--force"].(bool) {
+			FlushRequest(user, url, index)
+		}
+		return
 	}
 
 	return

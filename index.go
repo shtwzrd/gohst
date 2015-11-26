@@ -74,6 +74,17 @@ func (r Index) GetUnsynced() (result []IndexEntry, err error) {
 	if err != nil {
 		return
 	}
+
+	state, err := file.Stat()
+	if err != nil {
+		return
+	}
+
+	// exit if file is effectively empty
+	if state.Size() < 8 {
+		return nil, nil
+	}
+
 	reader := bufio.NewReader(file)
 	scanner := bufio.NewScanner(reader)
 

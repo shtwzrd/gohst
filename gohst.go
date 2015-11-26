@@ -55,7 +55,7 @@ func runCommand(cmd string, args []string, user string, url string) (err error) 
 	case "flush":
 		return flushCommand(argv, user, url)
 	case "log":
-		return logCommand(argv)
+		return logCommand(argv, user, url)
 	case "help", "":
 		fmt.Println("Not yet implemented")
 	default:
