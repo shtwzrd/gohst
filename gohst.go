@@ -35,7 +35,14 @@ See 'gohst help <command>' for more information on a specific command.
 	cmd := args["<command>"].(string)
 
 	user := args["--user"].(string)
-	url := "https://" + args["--domain"].(string)
+	domain := args["--domain"].(string)
+
+	var url string
+	if domain == "localhost" || domain == "127.0.0.1" {
+		url = "http://" + domain
+	} else {
+		url = "https://" + domain
+	}
 
 	cmdArgs := args["<args>"].([]string)
 	err := runCommand(cmd, cmdArgs, user, url)
