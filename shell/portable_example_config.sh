@@ -39,7 +39,7 @@ contains() {
 }
 
 __gohst_precmd_hook() {
-    gohst log result $1
+    gohst -u test -d gohst.herokuapp.com log result $1
 }
 
 # precmd is a hook executed every time the command prompt is drawn.
@@ -76,7 +76,7 @@ __gohst_preexec_hook() {
     __shell="$SHELL"
     __host="$(cat /etc/hostname)"
     __cmd="$@"
-    gohst log context $__user $__host $__shell $__pwd "$__cmd"
+    gohst -u test -d gohst.herokuapp.com log context $__user $__host $__shell $__pwd "$__cmd"
 }
 
 # preexec is invoked right before the execution of every command,

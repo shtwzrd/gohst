@@ -52,6 +52,10 @@ options:
 func logBasic(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
 
+	if hasSilentTag(tags) {
+		return nil
+	}
+
 	e := IndexEntry{}
 	e.Timestamp = time.Now().UTC()
 	e.Command = cmd
@@ -64,6 +68,10 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 
 func logContext(args map[string]interface{}, index Index) (err error) {
 	cmd, tags := parseOutTags(args["<cmd>"].(string))
+
+	if hasSilentTag(tags) {
+		return nil
+	}
 
 	e := IndexEntry{}
 	e.Timestamp = time.Now().UTC()
@@ -110,4 +118,13 @@ func parseOutTags(input string) (command string, tags []string) {
 		command = input
 	}
 	return
+}
+
+func hasSilentTag(input []string) bool {
+	for _, t := range input {
+		if strings.HasPrefix(t, "shh") {
+			return true
+		}
+	}
+	return false
 }
