@@ -20,6 +20,7 @@ type Index struct {
 
 func (r Index) Write(e IndexEntry) (err error) {
 	file, err := os.OpenFile(r.FilePath, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0644)
+	defer file.Close()
 
 	if err != nil {
 		return err
@@ -67,6 +68,7 @@ func (r Index) MarkSynced() (err error) {
 		}
 	}
 	err = w.Flush()
+	file.Close()
 	return
 }
 

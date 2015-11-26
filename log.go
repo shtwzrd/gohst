@@ -38,6 +38,7 @@ options:
 		err = logBasic(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
 			FlushRequest(user, url, index)
+			index.MarkSynced()
 		}
 		if err != nil {
 			fmt.Println(err)
@@ -53,6 +54,7 @@ options:
 		err = logResult(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
 			FlushRequest(user, url, index)
+			index.MarkSynced()
 		}
 		if err != nil {
 			fmt.Println(err)
@@ -79,7 +81,7 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 
 	err = index.Write(e)
 	index.Flush()
-	return index.MarkSynced()
+	return
 }
 
 func logContext(args map[string]interface{}, index Index) (err error) {
@@ -112,7 +114,7 @@ func logResult(args map[string]interface{}, index Index) (err error) {
 		err = index.Write(e)
 	}
 	index.Flush()
-	return index.MarkSynced()
+	return
 }
 
 func getResult(args map[string]interface{}) (result int8) {
