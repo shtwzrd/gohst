@@ -21,6 +21,7 @@
 if [ "$__prexec_defined" = "true" ]; then
     return 0
 fi
+
 __preexec_defined="true"
 
 # contains(string, substring)
@@ -39,9 +40,8 @@ contains() {
 }
 
 __gohst_precmd_hook() {
-    r="$1"
-    cmd='gohst -u man -d gohst.herokuapp.com log -f result'
-    cmd="$cmd $r"
+    cmd='gohst -u user -d gohst.herokuapp.com log -f result'
+    cmd="$cmd $1"
     cmd="$cmd &"
     sh -c "$cmd"
 }
@@ -54,21 +54,21 @@ __gohst_precmd_hook() {
 # Bash, you'll need to place any functions you use for setting the
 # PS1 prompt here. DO NOT modify $PS1 directly.
 precmd () {
+    __exitcode="$?"
     PRECMD_GUARD=true
-    __gohst_precmd_hook $1
+    __gohst_precmd_hook "$__exitcode"
 
     # Your precmd hooks and prompt-setters HERE
-    PS1_COMMAND $1
+    PS1_COMMAND "$__exitcode"
 
     PRECMD_GUARD=false
 }
 
-# an example precmd command for configuring your prompt
 PS1_COMMAND() {
     if [ "$1" = "0" ]; then
-        echo "$(tput setaf 2):) $(tput sgr0)"
+        echo "$(tput setaf 2)██ $(tput sgr0)"
     else
-        echo "$(tput setaf 1);( $(tput sgr0)"
+        echo "$(tput setaf 1)██ $(tput sgr0)"
     fi
 }
 
@@ -77,10 +77,10 @@ PS1_COMMAND() {
 __gohst_preexec_hook() {
     __pwd="$(pwd)"
     __user="$(whoami)"
-    __shell="$SHELL"
+    __shell="$(ps -p $$ -o fname=)"
     __host="$(cat /etc/hostname)"
     __cmd="$@"
-    gohst -u test -d gohst.herokuapp.com log context $__user $__host $__shell $__pwd "$__cmd"
+    gohst -u user -d gohst.herokuapp.com log context $__user $__host $__shell $__pwd "$__cmd"
 }
 
 # preexec is invoked right before the execution of every command,
@@ -97,16 +97,17 @@ preexec () {
 preexec_invoke_filter () {
     [ "$COMP_LINE" != "" ] && return  # do nothing if completing
 
-    # For Bash: don't cause a preexec for $PROMPT_COMMAND
-    [ -n "$BASH_COMMAND" -a "$BASH_COMMAND" = "$PROMPT_COMMAND" ] && return
     # Don't cause a preexec for our precmd command
     contains "${.sh.command}" "precmd" && return
     # Check the PRECMD_GUARD
     [ "$PRECMD_GUARD" = true ] && return
+    # Don't trigger when we're grabbing exitcode
+    contains "${.sh.command}" "__exitcode" && return
     # ... And don't trigger on the PRECMD_GUARDs themselves
     contains "${.sh.command}" "PRECMD_GUARD" && return
 
     __this_command="$(fc -lr | sed -n 1p | cut -f 2)"
+
     preexec "$__this_command"
 }
 

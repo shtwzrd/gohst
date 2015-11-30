@@ -72,6 +72,7 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 		return nil
 	}
 
+	index.Flush()
 	e := IndexEntry{}
 	e.Timestamp = time.Now().UTC()
 	e.Command = cmd
@@ -80,32 +81,35 @@ func logBasic(args map[string]interface{}, index Index) (err error) {
 	e.HasStatus = true
 
 	err = index.Write(e)
-	index.Flush()
 	return
 }
 
 func logContext(args map[string]interface{}, index Index) (err error) {
-	cmd, tags := parseOutTags(args["<cmd>"].(string))
+	if index.canWriteContext() {
+		index.Flush()
+		cmd, tags := parseOutTags(args["<cmd>"].(string))
 
-	if hasSilentTag(tags) {
-		index.Write(dummyContext())
-		return
+		if hasSilentTag(tags) {
+			index.Write(dummyContext())
+			return
+		}
+
+		e := IndexEntry{}
+		e.Timestamp = time.Now().UTC()
+		e.Command = cmd
+		e.Tags = tags
+		e.Directory = args["<dir>"].(string)
+		e.Host = args["<host>"].(string)
+		e.Shell = args["<shell>"].(string)
+		e.User = args["<user>"].(string)
+
+		return index.Write(e)
 	}
-
-	e := IndexEntry{}
-	e.Timestamp = time.Now().UTC()
-	e.Command = cmd
-	e.Tags = tags
-	e.Directory = args["<dir>"].(string)
-	e.Host = args["<host>"].(string)
-	e.Shell = args["<shell>"].(string)
-	e.User = args["<user>"].(string)
-
-	return index.Write(e)
+	return
 }
 
 func logResult(args map[string]interface{}, index Index) (err error) {
-	if index.lastLineValid() {
+	if index.canWriteResult() {
 
 		e := IndexEntry{}
 		e.Status = getResult(args)
@@ -113,12 +117,11 @@ func logResult(args map[string]interface{}, index Index) (err error) {
 
 		err = index.Write(e)
 	}
-	index.Flush()
 	return
 }
 
 func getResult(args map[string]interface{}) (result int8) {
-	if val, exists := args["<status>"]; exists {
+	if val, exists := args["<exitcode>"]; exists {
 		status, err := strconv.ParseInt(val.(string), 10, 8)
 		if err != nil {
 			fmt.Println(err)

@@ -123,8 +123,8 @@ func (r Index) Flush() {
 	}
 }
 
-func (r Index) lastLineValid() (valid bool) {
-	file, err := os.OpenFile(r.FilePath, os.O_RDWR, 0644)
+func (r Index) getLastLine() (last string) {
+	file, err := os.OpenFile(r.FilePath, os.O_RDONLY, 0644)
 	if err != nil {
 		return
 	}
@@ -132,20 +132,46 @@ func (r Index) lastLineValid() (valid bool) {
 	reader := bufio.NewReader(file)
 	scanner := bufio.NewScanner(reader)
 
-	var isValidLine bool
 	for scanner.Scan() {
-		for index, runeval := range scanner.Text() {
-			if index > 0 {
-				break
-			}
-			if runeval == Syncd || runeval == 'U' {
-				isValidLine = true
-			} else {
-				isValidLine = false
-			}
+		last = scanner.Text()
+	}
+	return last
+}
+
+func (r Index) canWriteResult() (valid bool) {
+	line := r.getLastLine()
+	for index, runeval := range line {
+		if index > 0 {
+			break
+		}
+		if runeval == Syncd || runeval == 'U' {
+			valid = true
+		} else {
+			valid = false
 		}
 	}
-	return isValidLine
+
+	if !valid {
+		return
+	}
+
+	return !r.canWriteContext()
+}
+
+func (r Index) canWriteContext() (valid bool) {
+	line := r.getLastLine()
+	if line == "" {
+		return true
+	}
+
+	for _, runeval := range line {
+		if runeval != D {
+			valid = true
+		} else {
+			valid = false
+		}
+	}
+	return valid
 }
 
 func parseToEntry(line string) (e IndexEntry, err error) {
