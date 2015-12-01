@@ -9,7 +9,7 @@ A command-line client for logging and querying your command line history across 
 3. Fetch gohst
 Install it via `go get` like so:
 
-    go get github.com/warreq/gohst
+    `go get github.com/warreq/gohst`
 
 _or_
 
