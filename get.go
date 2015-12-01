@@ -26,7 +26,7 @@ options:
   -X, --exclude-success        filter out entries with a 0 exit status
   -A, --ALL                    return everything
 `
-	args, err := docopt.Parse(usage, argv, false, "", false, false)
+	args, err := docopt.Parse(usage, argv, true, "", false, true)
 
 	verbose := args["--verbose"].(bool)
 

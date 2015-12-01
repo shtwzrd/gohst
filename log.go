@@ -29,7 +29,7 @@ options:
 	-f, --force          write entry immediately to the remote
 `
 
-	arguments, _ := docopt.Parse(usage, argv, true, "", false)
+	arguments, _ := docopt.Parse(usage, argv, true, "", true)
 
 	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), arguments["--FILE"].(string))
 	index := Index{path}

@@ -27,9 +27,8 @@ The supported gohst commands are:
    forget     Remove an entry from the history
    stat       Display usage statistics and current session information
    tags       List all tags referenced in the command history
-   commands   List all commands gohst has seen you use
 
-See 'gohst help <command>' for more information on a specific command.
+See 'gohst <command> --help' for more information on a specific command.
 `
 	args, _ := docopt.Parse(usage, nil, true, "gohst version 0.1", true)
 
@@ -65,8 +64,6 @@ func runCommand(cmd string, args []string, user string, url string) (err error) 
 		return flushCommand(argv, user, url)
 	case "log":
 		return logCommand(argv, user, url)
-	case "help", "":
-		fmt.Println("Not yet implemented")
 	default:
 		fmt.Println("Not yet implemented")
 	}
