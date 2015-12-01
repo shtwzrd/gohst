@@ -7,9 +7,12 @@ A command-line client for logging and querying your command line history across 
 1. Install Go for your platform
 2. Set the GOPATH environment variable
 3. Fetch gohst
-Install it via `go get`
+Install it via `go get` like so:
+
     go get github.com/warreq/gohst
+
 _or_
+
     git clone https://github.com/warreq/gohst
     cd gohst 
     go build -o gohst
