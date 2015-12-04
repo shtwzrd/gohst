@@ -16,7 +16,12 @@ options:
 	--FILE=<file>        alternate hist file, relative to home [default: .gohstry]
 `
 
-	arguments, _ := docopt.Parse(usage, argv, true, "", true)
+	arguments, _ := docopt.Parse(usage, argv, false, "", false)
+
+	if arguments["-h"].(bool) || arguments["--help"].(bool) {
+		fmt.Println(usage)
+		os.Exit(0)
+	}
 
 	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), arguments["--FILE"].(string))
 	index := Index{path}

@@ -13,26 +13,25 @@ import (
 func logCommand(argv []string, user string, url string) (err error) {
 	usage := `gohst log; write commands to history
 Usage:
-	gohst log basic [options] <cmd> <exitcode>
-	gohst log result [options] <exitcode>
-	gohst log context [options] <user> <host> <shell> <dir> <cmd>
+	gohst log basic <cmd> <exitcode> [--FILE=<file>] [-f | --force]
+	gohst log result <exitcode> [--FILE=<file>] [-f | --force]
+	gohst log context <user> <host> <shell> <dir> <cmd> [--FILE=<file>]
+	gohst log -h | --help
 
 options:
-	-h, --help
-	<user>               the user issuing the command
-	<host>               the hostname identifying the machine
-	<shell>              the name of the shell from which the command is invoked
-	<dir>                the directory from which the command was invoked
-	<exitcode>           the exit code of the command
-	<cmd>                the executed command
 	--FILE=<file>        alternate hist file, relative to home [default: .gohstry]
 	-f, --force          write entry immediately to the remote
 `
 
-	arguments, _ := docopt.Parse(usage, argv, true, "", true)
+	arguments, _ := docopt.Parse(usage, argv, false, "", false)
 
 	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), arguments["--FILE"].(string))
 	index := Index{path}
+
+	if arguments["-h"].(bool) || arguments["--help"].(bool) {
+		fmt.Println(usage)
+		os.Exit(0)
+	}
 
 	if arguments["basic"].(bool) {
 		err = logBasic(arguments, index)

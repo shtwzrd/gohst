@@ -40,9 +40,9 @@ contains() {
 }
 
 __gohst_precmd_hook() {
-    cmd='gohst -u user -d gohst.herokuapp.com log -f result'
+    cmd='gohst -u user -d gohst.herokuapp.com log result'
     cmd="$cmd $1"
-    cmd="$cmd &"
+    cmd="$cmd -f &"
     sh -c "$cmd"
 }
 
