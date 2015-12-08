@@ -241,7 +241,7 @@ func toHistLine(e IndexEntry) (record string) {
 	}
 
 	if e.HasStatus {
-		record = fmt.Sprintf("%s%d%c", record, e.Status, D)
+		record = fmt.Sprintf("%s%d", record, e.Status)
 	}
 	return
 }

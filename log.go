@@ -52,8 +52,10 @@ options:
 	if arguments["result"].(bool) {
 		err = logResult(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
-			FlushRequest(user, url, index)
-			index.MarkSynced()
+			flushed := FlushRequest(user, url, index)
+			if flushed {
+				index.MarkSynced()
+			}
 		}
 		if err != nil {
 			fmt.Println(err)

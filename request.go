@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func FlushRequest(user string, url string, index Index) {
+func FlushRequest(user string, url string, index Index) (success bool) {
 	unsynced, err := index.GetUnsynced()
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "Invalid Hist File Error: ", err))
@@ -20,7 +20,7 @@ func FlushRequest(user string, url string, index Index) {
 		payload[i] = v.ToInvocation()
 	}
 	query := url + "/api/users/" + user + "/commands"
-	send(query, payload)
+	success = send(query, payload)
 	return
 }
 
@@ -39,7 +39,7 @@ func GetRequest(user string, url string, verbose bool, count int) (result []stri
 	return
 }
 
-func send(url string, invs Invocations) {
+func send(url string, invs Invocations) (success bool) {
 	jsonStr, err := json.Marshal(invs)
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "JSON Encoding Error: ", err))
@@ -53,7 +53,14 @@ func send(url string, invs Invocations) {
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "Connection Error: ", err))
 	}
+	if resp.StatusCode != http.StatusCreated {
+		success = false
+	} else {
+		success = true
+	}
+
 	defer resp.Body.Close()
+	return
 }
 
 func receive(url string, isJson bool) (commands []string) {
