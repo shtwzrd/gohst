@@ -135,6 +135,7 @@ func (r Index) getLastLine() (last string) {
 	for scanner.Scan() {
 		last = scanner.Text()
 	}
+	defer file.Close()
 	return last
 }
 
@@ -241,7 +242,7 @@ func toHistLine(e IndexEntry) (record string) {
 	}
 
 	if e.HasStatus {
-		record = fmt.Sprintf("%s%d", record, e.Status)
+		record = fmt.Sprintf("%s%d%c", record, e.Status, D)
 	}
 	return
 }
