@@ -20,7 +20,7 @@ type IndexEntry struct {
 func (e IndexEntry) ToInvocation() (inv Invocation) {
 	inv.Timestamp = e.Timestamp
 	inv.Tags = e.Tags
-	inv.Status = e.Status
+	inv.ExitCode = e.Status
 	inv.Host = e.Host
 	inv.User = e.User
 	inv.Shell = e.Shell
