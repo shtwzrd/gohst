@@ -9,7 +9,6 @@ type Commands []Command
 
 type Invocation struct {
 	Id        int       `json:"id"`
-	SessionId int       `json:"sessionid"`
 	Command   string    `json:"command"`
 	Directory string    `json:"directory"`
 	User      string    `json:"user"`
