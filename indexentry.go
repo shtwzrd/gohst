@@ -1,6 +1,7 @@
 package main
 
 import (
+	gohst "github.com/warreq/gohstd/src/gohstd/common"
 	"time"
 )
 
@@ -17,7 +18,7 @@ type IndexEntry struct {
 	IsSynced  bool
 }
 
-func (e IndexEntry) ToInvocation() (inv Invocation) {
+func (e IndexEntry) ToInvocation() (inv gohst.Invocation) {
 	inv.Timestamp = e.Timestamp
 	inv.Tags = e.Tags
 	inv.ExitCode = e.Status

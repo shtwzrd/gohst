@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	gohst "github.com/warreq/gohstd/src/gohstd/common"
 	"io/ioutil"
 	"net/http"
 )
@@ -14,7 +15,7 @@ func FlushRequest(user string, url string, index Index) (success bool) {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "Invalid Hist File Error: ", err))
 	}
 
-	payload := make(Invocations, len(unsynced))
+	payload := make(gohst.Invocations, len(unsynced))
 
 	for i, v := range unsynced {
 		payload[i] = v.ToInvocation()
@@ -39,7 +40,7 @@ func GetRequest(user string, url string, verbose bool, count int) (result []stri
 	return
 }
 
-func send(url string, invs Invocations) (success bool) {
+func send(url string, invs gohst.Invocations) (success bool) {
 	jsonStr, err := json.Marshal(invs)
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "JSON Encoding Error: ", err))
@@ -93,7 +94,7 @@ func receive(url string, isJson bool) (commands []string) {
 	return
 }
 
-func unmarshalInvocations(content []byte) (result Invocations, err error) {
+func unmarshalInvocations(content []byte) (result gohst.Invocations, err error) {
 	err = json.Unmarshal(content, &result)
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "Malformed Response Error: ", err))
