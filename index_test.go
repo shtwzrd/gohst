@@ -20,7 +20,7 @@ func TestToHistLine_NoExitStatus(t *testing.T) {
 	e.User = "soren"
 	e.Timestamp = now
 
-	expected := "" + now.Format(time.UnixDate) +
+	expected := "U" + "" + now.Format(time.UnixDate) +
 		"sorenlaptopbash/home/soren/src/project" +
 		"git log --graph --abbrev-commit --decorate --date=relative --all" +
 		"[git log graph]"
@@ -45,10 +45,10 @@ func TestToHistLine_WithExitStatus(t *testing.T) {
 	e.User = "soren"
 	e.Timestamp = now
 
-	expected := "" + now.Format(time.UnixDate) +
+	expected := "U" + "" + now.Format(time.UnixDate) +
 		"sorenlaptopbash/home/soren/src/project" +
 		"git log --graph --abbrev-commit --decorate --date=relative --all" +
-		"[git log graph]0\n"
+		"[git log graph]0"
 
 	result := toHistLine(e)
 
