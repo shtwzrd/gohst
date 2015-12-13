@@ -1,7 +1,7 @@
 package main
 
 import (
-	gohst "github.com/warreq/gohstd/src/gohstd/common"
+	gohst "github.com/warreq/gohstd/common"
 	"time"
 )
 

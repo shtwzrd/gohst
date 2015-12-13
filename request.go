@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	gohst "github.com/warreq/gohstd/src/gohstd/common"
+	gohst "github.com/warreq/gohstd/common"
 	"io/ioutil"
 	"net/http"
 )
