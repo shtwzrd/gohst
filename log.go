@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/docopt/docopt-go"
+	g "github.com/warreq/gohstd/common"
 	"os"
 	"regexp"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 	"time"
 )
 
-func logCommand(argv []string, user string, url string) (err error) {
+func logCommand(argv []string, user string, repo g.CommandRepo) (err error) {
 	usage := `gohst log; write commands to history
 Usage:
 	gohst log basic <cmd> <exitcode> [--FILE=<file>] [-f | --force]
@@ -36,7 +37,7 @@ options:
 	if arguments["basic"].(bool) {
 		err = logBasic(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
-			FlushRequest(user, url, index)
+			flush(user, index, repo)
 			index.MarkSynced()
 		}
 		if err != nil {
@@ -52,8 +53,8 @@ options:
 	if arguments["result"].(bool) {
 		err = logResult(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
-			flushed := FlushRequest(user, url, index)
-			if flushed {
+			err = flush(user, index, repo)
+			if err == nil {
 				index.MarkSynced()
 			}
 		}

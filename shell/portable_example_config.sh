@@ -40,7 +40,7 @@ contains() {
 }
 
 __gohst_precmd_hook() {
-    cmd='gohst -u user -d gohst.herokuapp.com log result'
+    cmd='gohst -u user -p password -d gohst.herokuapp.com log result'
     cmd="$cmd $1"
     cmd="$cmd -f &"
     sh -c "$cmd"
@@ -80,7 +80,7 @@ __gohst_preexec_hook() {
     __shell="$(ps -p $$ -o fname=)"
     __host="$(cat /etc/hostname)"
     __cmd="$@"
-    gohst -u user -d gohst.herokuapp.com log context $__user $__host $__shell $__pwd "$__cmd"
+    gohst -u user -p password -d gohst.herokuapp.com log context $__user $__host $__shell $__pwd "$__cmd"
 }
 
 # preexec is invoked right before the execution of every command,

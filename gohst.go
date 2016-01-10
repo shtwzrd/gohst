@@ -10,13 +10,14 @@ import (
 func main() {
 	usage := `gohst.
 
-Usage: gohst (-u USER) (-d URL) <command> [<args>...]
+Usage: gohst [(-u USER) (-p PASS) (-d URL)] <command> [<args>...]
        gohst --version
        gohst -h | --help
 
 Options:
    -d --domain=URL  Domain of the web service, e.g. gohst.herokuapp.com
    -u --user=USER
+   -p --password=PASS
    -h --help
    --version
 
@@ -36,6 +37,7 @@ See 'gohst <command> --help' for more information on a specific command.
 
 	user := args["--user"].(string)
 	domain := args["--domain"].(string)
+	password := args["--password"].(string)
 
 	var url string
 	if strings.HasPrefix(domain, "localhost") ||
@@ -45,25 +47,27 @@ See 'gohst <command> --help' for more information on a specific command.
 		url = "https://" + domain
 	}
 
+	service := NewService(user, password, url)
 	cmdArgs := args["<args>"].([]string)
-	err := runCommand(cmd, cmdArgs, user, url)
+	err := runCommand(cmd, cmdArgs, user, service)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func runCommand(cmd string, args []string, user string, url string) (err error) {
+func runCommand(cmd string, args []string, user string, serv Service) error {
+	cmdRepo := HttpCommandRepo{serv}
 	argv := make([]string, 1)
 	argv[0] = cmd
 	argv = append(argv, args...)
 	switch cmd {
 	case "get":
-		return getCommand(argv, user, url)
+		return getCommand(argv, user, cmdRepo)
 	case "flush":
-		return flushCommand(argv, user, url)
+		return flushCommand(argv, user, cmdRepo)
 	case "log":
-		return logCommand(argv, user, url)
+		return logCommand(argv, user, cmdRepo)
 	default:
 		fmt.Println("Not yet implemented")
 	}

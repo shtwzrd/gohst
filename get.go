@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/docopt/docopt-go"
+	g "github.com/warreq/gohstd/common"
 	"strconv"
 )
 
-func getCommand(argv []string, user string, url string) (err error) {
+func getCommand(argv []string, user string, repo g.CommandRepo) (err error) {
 	usage := `gohst.
 
 Usage:
@@ -38,7 +39,24 @@ options:
 		}
 	}
 
-	results := GetRequest(user, url, verbose, count)
+	results := make([]string, 0)
+	if verbose {
+		invocs, err := repo.GetInvocations(user, count)
+		if err != nil {
+			panic(err)
+		}
+		for _, v := range invocs {
+			results = append(results, fmt.Sprint(v))
+		}
+	} else {
+		cmds, err := repo.GetCommands(user, count)
+		if err != nil {
+			panic(err)
+		}
+		for _, v := range cmds {
+			results = append(results, fmt.Sprint(v))
+		}
+	}
 
 	for i := len(results) - 1; i >= 0; i-- {
 		fmt.Println(results[i])
