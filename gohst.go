@@ -81,7 +81,7 @@ func DetectProtocol(domain string) (url string) {
 }
 
 func RunCommand(cmd string, args []string, cfg Config, serv Service) error {
-	cmdRepo := HttpCommandRepo{serv}
+	cmdRepo := NewHttpCommandRepo(serv, cfg.Key)
 	argv := make([]string, 1)
 	argv[0] = cmd
 	argv = append(argv, args...)

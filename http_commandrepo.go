@@ -9,9 +9,26 @@ import (
 
 type HttpCommandRepo struct {
 	http Service
+	key  []byte
+}
+
+func NewHttpCommandRepo(http Service, key []byte) HttpCommandRepo {
+	repo := HttpCommandRepo{}
+	repo.http = http
+	repo.key = key
+	return repo
 }
 
 func (h HttpCommandRepo) InsertInvocations(user string, invs g.Invocations) error {
+	// Send the invocations unencrypted if no key was provided
+	if len(h.key) > 0 {
+		encrypted, err := EncryptInvocations(invs, h.key)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Error: Could not encrypt commands: %s", err))
+		}
+		fmt.Println(encrypted)
+		return h.http.SendJson(user, fmt.Sprintf("/api/users/%s/commands", user), encrypted)
+	}
 	return h.http.SendJson(user, fmt.Sprintf("/api/users/%s/commands", user), invs)
 }
 

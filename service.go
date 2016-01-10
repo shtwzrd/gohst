@@ -61,7 +61,6 @@ func (s Service) Receive(user, route string) (content []byte, err error) {
 		return nil, err
 	}
 
-	fmt.Println(resp.StatusCode)
 	if resp.StatusCode > HttpSuccess {
 		return nil, errors.New(fmt.Sprintf("Server responded with HTTP status code %d", resp.StatusCode))
 	}
