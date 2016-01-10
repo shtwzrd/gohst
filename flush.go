@@ -5,16 +5,17 @@ import (
 	"github.com/docopt/docopt-go"
 	g "github.com/warreq/gohstd/common"
 	"os"
+	"path/filepath"
 )
 
-func flushCommand(argv []string, user string, repo g.CommandRepo) (err error) {
+func flushCommand(argv []string, cfg Config, repo g.CommandRepo) (err error) {
 	usage := `gohst flush; sync history with the remote
 Usage:
 	gohst flush [options]
 
 options:
 	-h, --help
-	--FILE=<file>        alternate hist file, relative to home [default: .gohstry]
+	--FILE=<file>        alternate hist file, relative to home
 `
 
 	arguments, _ := docopt.Parse(usage, argv, false, "", false)
@@ -24,10 +25,15 @@ options:
 		os.Exit(0)
 	}
 
-	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), arguments["--FILE"].(string))
+	var path string
+	if arguments["--FILE"] != nil {
+		path = filepath.Join(os.Getenv("HOME"), arguments["--FILE"].(string))
+	} else {
+		path = filepath.Join(DefaultDir(), Hist)
+	}
 	index := Index{path}
 
-	err = flush(user, index, repo)
+	err = flush(cfg.Username, index, repo)
 	if err != nil {
 		return
 	}

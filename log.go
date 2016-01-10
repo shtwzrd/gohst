@@ -5,13 +5,14 @@ import (
 	"github.com/docopt/docopt-go"
 	g "github.com/warreq/gohstd/common"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func logCommand(argv []string, user string, repo g.CommandRepo) (err error) {
+func logCommand(argv []string, cfg Config, repo g.CommandRepo) (err error) {
 	usage := `gohst log; write commands to history
 Usage:
 	gohst log basic <cmd> <exitcode> [--FILE=<file>] [-f | --force]
@@ -20,13 +21,18 @@ Usage:
 	gohst log -h | --help
 
 options:
-	--FILE=<file>        alternate hist file, relative to home [default: .gohstry]
+	--FILE=<file>        alternate hist file, relative to home
 	-f, --force          write entry immediately to the remote
 `
 
 	arguments, _ := docopt.Parse(usage, argv, false, "", false)
 
-	path := fmt.Sprintf("%s/%s", os.Getenv("HOME"), arguments["--FILE"].(string))
+	var path string
+	if arguments["--FILE"] != nil {
+		path = filepath.Join(os.Getenv("HOME"), arguments["--FILE"].(string))
+	} else {
+		path = filepath.Join(DefaultDir(), Hist)
+	}
 	index := Index{path}
 
 	if arguments["-h"].(bool) || arguments["--help"].(bool) {
@@ -37,8 +43,13 @@ options:
 	if arguments["basic"].(bool) {
 		err = logBasic(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
-			flush(user, index, repo)
-			index.MarkSynced()
+			err := flush(cfg.Username, index, repo)
+			if err == nil {
+				err2 := index.MarkSynced()
+				if err2 != nil {
+					fmt.Println(err2)
+				}
+			}
 		}
 		if err != nil {
 			fmt.Println(err)
@@ -53,9 +64,12 @@ options:
 	if arguments["result"].(bool) {
 		err = logResult(arguments, index)
 		if err == nil && arguments["--force"].(bool) {
-			err = flush(user, index, repo)
+			err = flush(cfg.Username, index, repo)
 			if err == nil {
-				index.MarkSynced()
+				err2 := index.MarkSynced()
+				if err2 != nil {
+					fmt.Println(err2)
+				}
 			}
 		}
 		if err != nil {

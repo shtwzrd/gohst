@@ -12,12 +12,12 @@ type HttpCommandRepo struct {
 }
 
 func (h HttpCommandRepo) InsertInvocations(user string, invs g.Invocations) error {
-	return h.http.SendJson(fmt.Sprintf("/api/users/%s/commands", user), invs)
+	return h.http.SendJson(user, fmt.Sprintf("/api/users/%s/commands", user), invs)
 }
 
 func (h HttpCommandRepo) GetInvocations(user string, n int) (g.Invocations, error) {
 	route := fmt.Sprintf("/api/users/%s/commands?verbose=true&count=%d", user, n)
-	content, err := h.http.Receive(route)
+	content, err := h.http.Receive(user, route)
 	if err != nil {
 		return nil, errors.New((fmt.Sprintf("[gohst] %s: %s\n", "Connection Error: ", err)))
 	}
@@ -32,7 +32,7 @@ func (h HttpCommandRepo) GetInvocations(user string, n int) (g.Invocations, erro
 
 func (h HttpCommandRepo) GetCommands(user string, n int) (g.Commands, error) {
 	route := fmt.Sprintf("/api/users/%s/commands?verbose=false&count=%d", user, n)
-	content, err := h.http.Receive(route)
+	content, err := h.http.Receive(user, route)
 
 	if err != nil {
 		return nil, errors.New((fmt.Sprintf("[gohst] %s: %s\n", "Connection Error: ", err)))

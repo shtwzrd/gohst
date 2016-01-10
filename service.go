@@ -14,28 +14,26 @@ import (
 const HttpSuccess = 226
 
 type Service struct {
-	Username string
 	Password string
-	Domain   string
+	Url      string
 }
 
-func NewService(user string, pass string, domain string) Service {
+func NewService(url string, password string) Service {
 	service := Service{}
-	service.Username = user
-	service.Password = pass
-	service.Domain = domain
+	service.Password = password
+	service.Url = url
 	return service
 }
 
-func (s Service) SendJson(route string, data interface{}) error {
+func (s Service) SendJson(user, route string, data interface{}) error {
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "JSON Encoding Error: ", err))
 	}
 
-	req, err := http.NewRequest("POST", s.Domain+route, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", s.Url+route, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(s.Username, s.Password)
+	req.SetBasicAuth(user, s.Password)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -52,10 +50,10 @@ func (s Service) SendJson(route string, data interface{}) error {
 	}
 }
 
-func (s Service) Receive(route string) (content []byte, err error) {
-	req, err := http.NewRequest("GET", s.Domain+route, nil)
+func (s Service) Receive(user, route string) (content []byte, err error) {
+	req, err := http.NewRequest("GET", s.Url+route, nil)
 	req.Header.Set("Accept", "application/json")
-	req.SetBasicAuth(s.Username, s.Password)
+	req.SetBasicAuth(user, s.Password)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

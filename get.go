@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func getCommand(argv []string, user string, repo g.CommandRepo) (err error) {
+func getCommand(argv []string, cfg Config, repo g.CommandRepo) (err error) {
 	usage := `gohst.
 
 Usage:
@@ -41,7 +41,7 @@ options:
 
 	results := make([]string, 0)
 	if verbose {
-		invocs, err := repo.GetInvocations(user, count)
+		invocs, err := repo.GetInvocations(cfg.Username, count)
 		if err != nil {
 			panic(err)
 		}
@@ -49,7 +49,7 @@ options:
 			results = append(results, fmt.Sprint(v))
 		}
 	} else {
-		cmds, err := repo.GetCommands(user, count)
+		cmds, err := repo.GetCommands(cfg.Username, count)
 		if err != nil {
 			panic(err)
 		}
