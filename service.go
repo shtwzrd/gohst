@@ -41,7 +41,6 @@ func (s Service) SendJson(user, route string, data interface{}) error {
 		panic(fmt.Sprintf("[gohst] %s: %s\n", "Error sending data: ", err))
 	}
 
-	fmt.Println(resp.StatusCode)
 	if resp.StatusCode > HttpSuccess {
 		return errors.New(fmt.Sprintf("Server responded with HTTP status code %d", resp.StatusCode))
 	} else {

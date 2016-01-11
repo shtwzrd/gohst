@@ -26,7 +26,6 @@ func (h HttpCommandRepo) InsertInvocations(user string, invs g.Invocations) erro
 		if err != nil {
 			return errors.New(fmt.Sprintf("Error: Could not encrypt commands: %s", err))
 		}
-		fmt.Println(encrypted)
 		return h.http.SendJson(user, fmt.Sprintf("/api/users/%s/commands", user), encrypted)
 	}
 	return h.http.SendJson(user, fmt.Sprintf("/api/users/%s/commands", user), invs)
